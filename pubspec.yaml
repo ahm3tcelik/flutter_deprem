@@ -10,6 +10,9 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  map: any
+  latlng: any
+  cached_network_image: ^3.0.0
   webfeed: any
   http: any
   intl: any
