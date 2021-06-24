@@ -58,31 +58,6 @@ class _DepremlerPageState extends State<DepremlerPage> {
     return Scaffold(
         appBar: AppBar(
           title: Text('Depremler'),
-          actions: [
-            PopupMenuButton(
-              itemBuilder: (BuildContext bc) => [
-                PopupMenuItem(
-                    value: "ASC",
-                    child: ListTile(
-                      title: Text("Şiddete Göre Artan"),
-                      trailing: Icon(Icons.arrow_upward),
-                    )),
-                PopupMenuItem(
-                    value: "DESC",
-                    child: ListTile(
-                      title: Text("Şiddete Göre Azalan"),
-                      trailing: Icon(Icons.arrow_downward),
-                    )),
-              ],
-              onSelected: (value) {
-                dbHelper.sortBy(value!).then((_list) {
-                  setState(() {
-                    list = _list;
-                  });
-                });
-              },
-            ),
-          ],
         ),
         body: _buildBody());
   }
@@ -90,7 +65,12 @@ class _DepremlerPageState extends State<DepremlerPage> {
   Widget _buildBody() {
     return Column(
       children: [
-        _buildSearch(),
+        Row(
+            children: [
+          Expanded(child: _buildSearch()),
+          const SizedBox(width: 4),
+          _buildFilter(),
+        ]),
         const SizedBox(height: 4),
         Expanded(
           child: Builder(
@@ -104,6 +84,33 @@ class _DepremlerPageState extends State<DepremlerPage> {
           ),
         )
       ],
+    );
+  }
+
+  Widget _buildFilter() {
+    return PopupMenuButton(
+      icon: Icon(Icons.filter_alt, size: 30, color: Colors.blue,),
+      itemBuilder: (BuildContext bc) => [
+        PopupMenuItem(
+            value: "ASC",
+            child: ListTile(
+              title: Text("Şiddete Göre Artan"),
+              trailing: Icon(Icons.arrow_upward),
+            )),
+        PopupMenuItem(
+            value: "DESC",
+            child: ListTile(
+              title: Text("Şiddete Göre Azalan"),
+              trailing: Icon(Icons.arrow_downward),
+            )),
+      ],
+      onSelected: (value) {
+        dbHelper.sortBy(value!).then((_list) {
+          setState(() {
+            list = _list;
+          });
+        });
+      },
     );
   }
 
