@@ -5,57 +5,50 @@ import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
 class DbHelper {
+  final _tableName = "depremler";
   Database? _db;
 
-  Future<Database?> get db async {
+  Future<Database> get db async {
     if (_db == null) {
       _db = await initializeDb();
     }
-    return _db;
+    return _db!;
   }
-
-  get createDb => null;
 
   Future<Database> initializeDb() async {
     String dbPath = join(await getDatabasesPath(), "etrade.db");
     var eTrade = await openDatabase(dbPath, version: 1, onCreate: createDb);
     return eTrade;
   }
-/*
+
   void createDb(Database db, int version) async {
     await db.execute(
-        "Create table products (id integer primary key, baslik text, aciklama text )");
+        "Create table $_tableName (id integer primary key, baslik text, tarih text, saat text, buyukluk text ,enlem real, boylam real )");
   }
 
-  Future<List<Deprem>> getProducts() async {
+  Future<List<Deprem>> getDepremler() async {
     Database? db = await this.db;
 
-    var response = await db!.query("products");
+    var response = await db.query(_tableName);
 
-    return List.generate(
-        response.length, (index) => Deprem.fromJson(response[index]));
+    return response.map((e) => Deprem.fromJson(e)).toList();
   }
 
-  Future<int> insert(Deprem product) async {
+  Future<void> batchInsertOverWrite(List<Deprem> depremler) async {
     Database? db = await this.db;
 
-    var response = await db!.insert("products", product.toJson());
-    return response;
+    Batch _batch = db.batch();
+    _batch.delete(_tableName);
+    depremler.forEach((deprem) {
+      _batch.insert(_tableName, deprem.toJson());
+    });
+
+    _batch.commit();
   }
 
-  Future<int> delete(int id) async {
-    Database? db = await this.db;
-
-    var response = await db!.rawDelete("Delete from products where id=$id");
-    return response;
+  Future<List<Deprem>> search(String key) async {
+    final db = await this.db;
+    var response = await db.query(_tableName, where: "baslik LIKE '%$key%' ");
+    return response.map((e) => Deprem.fromJson(e)).toList();
   }
-
-  Future<int> update(Deprem product) async {
-    Database? db = await this.db;
-
-    var response = await db!.update("products", product.toJson(),
-        where: "id=?", whereArgs: [product.id]);
-    return response;
-  }
-*/
 }
