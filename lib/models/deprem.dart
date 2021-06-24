@@ -31,7 +31,7 @@ class Deprem {
       buyukluk: splitDesc?[6] ?? '0.0',
       saat: DateFormat(DateFormat.HOUR24_MINUTE)
           .format(item.pubDate ?? DateTime.now()),
-      tarih: DateFormat('dd.mm.yyyy').format(item.pubDate ?? DateTime.now()),
+      tarih: DateFormat('dd.MM.yyyy').format(item.pubDate ?? DateTime.now()),
     );
   }
 
