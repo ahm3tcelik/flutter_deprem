@@ -51,4 +51,12 @@ class DbHelper {
     var response = await db.query(_tableName, where: "baslik LIKE '%$key%' ");
     return response.map((e) => Deprem.fromJson(e)).toList();
   }
+
+    Future<List<Deprem>> sortBy(Object option) async {
+    final db = await this.db;
+    var response = await db.query(_tableName, orderBy:"buyukluk $option ");
+    return response.map((e) => Deprem.fromJson(e)).toList();
+  }
 }
+
+
