@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_deprem/models/deprem.dart';
-import 'package:flutter_deprem/pages/deprem_detail.dart';
-import 'package:flutter_deprem/services/rss_service.dart';
-import 'package:flutter_deprem/services/sqlite/db_helper.dart';
+import '../models/deprem.dart';
+import 'deprem_detail.dart';
+import '../services/rss_service.dart';
+import '../services/sqlite/db_helper.dart';
 
 class DepremlerPage extends StatefulWidget {
   const DepremlerPage({Key? key}) : super(key: key);
@@ -18,11 +18,13 @@ class _DepremlerPageState extends State<DepremlerPage> {
 
   @override
   void initState() {
+    // Sayfa açıldığında verileri yükle
     onRefresh();
     super.initState();
   }
 
   void loadFromLocal() {
+    // sqliteden verileri getir, ekranı yenile
     dbHelper.getDepremler().then((_list) {
       setState(() {
         list = _list;
@@ -31,10 +33,13 @@ class _DepremlerPageState extends State<DepremlerPage> {
   }
 
   void loadFromRemote() async {
+    // rss den verileri çek
     rssService.fetch().then((_list) async {
+      // sqlite local db ye yazdır.
       await dbHelper.batchInsertOverWrite(_list);
       loadFromLocal();
 
+      // listenin yenilendiğini mesajla bildir
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text('Liste yenilendi'),
       ));
@@ -65,8 +70,7 @@ class _DepremlerPageState extends State<DepremlerPage> {
   Widget _buildBody() {
     return Column(
       children: [
-        Row(
-            children: [
+        Row(children: [
           Expanded(child: _buildSearch()),
           const SizedBox(width: 4),
           _buildFilter(),
@@ -87,9 +91,14 @@ class _DepremlerPageState extends State<DepremlerPage> {
     );
   }
 
+  // Filtrele popup menusu
   Widget _buildFilter() {
     return PopupMenuButton(
-      icon: Icon(Icons.filter_alt, size: 30, color: Colors.blue,),
+      icon: Icon(
+        Icons.filter_alt,
+        size: 30,
+        color: Colors.blue,
+      ),
       itemBuilder: (BuildContext bc) => [
         PopupMenuItem(
             value: "ASC",
@@ -114,6 +123,7 @@ class _DepremlerPageState extends State<DepremlerPage> {
     );
   }
 
+  // Arama kutucuğu
   Widget _buildSearch() {
     return Padding(
       padding: const EdgeInsets.all(8),
@@ -132,12 +142,14 @@ class _DepremlerPageState extends State<DepremlerPage> {
 
   Widget _buildDepremListView() {
     final _list = list ?? [];
+    // yukarıdan aşağya çekince sayfayı yenile (pull to refresh)
     return RefreshIndicator(
       onRefresh: onRefresh,
       child: ListView.separated(
         itemCount: _list.length,
         itemBuilder: (context, index) => ListTile(
           onTap: () {
+            // listenin öğresine tıkladığında detay sayfasına git
             Navigator.push(
               context,
               MaterialPageRoute(

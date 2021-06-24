@@ -1,8 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_deprem/models/deprem.dart';
+import '../models/deprem.dart';
 import 'package:latlng/latlng.dart';
 import 'package:map/map.dart';
 
