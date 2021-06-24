@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_deprem/models/deprem.dart';
 import 'package:flutter_deprem/pages/deprem_detail.dart';
 import 'package:flutter_deprem/services/rss_service.dart';
+import 'package:flutter_deprem/services/sqlite/db_helper.dart';
 
 class DepremlerPage extends StatefulWidget {
   const DepremlerPage({Key? key}) : super(key: key);
@@ -12,6 +13,7 @@ class DepremlerPage extends StatefulWidget {
 
 class _DepremlerPageState extends State<DepremlerPage> {
   final rssService = RssService.instance;
+  var dbHelper = DbHelper();
   List<Deprem>? list;
 
   @override
@@ -21,17 +23,16 @@ class _DepremlerPageState extends State<DepremlerPage> {
   }
 
   void loadFromLocal() {
-    // sql den verileri çekcek
-    /*
-    setState(() {
-      list = _list;
+    dbHelper.getDepremler().then((_list) {
+      setState(() {
+        list = _list;
+      });
     });
-    
-     */
   }
+
   void loadFromRemote() async {
-    // RSS DEN GELEN VERİLER SQLITE REPLACE EDILECEK
-    rssService.fetch().then((_list) {
+    rssService.fetch().then((_list) async {
+      await dbHelper.batchInsertOverWrite(_list);
       loadFromLocal();
 
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
@@ -45,23 +46,20 @@ class _DepremlerPageState extends State<DepremlerPage> {
   }
 
   void onSearch(String key) {
-    // search local db then setState list
+    dbHelper.search(key).then((_list) {
+      setState(() {
+        list = _list;
+      });
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Depremler'),
-      ),
-      body: Builder(
-        builder: (context) {
-          if (list == null) return CircularProgressIndicator();
-          if (list!.isEmpty) return Center(child: Text('Maalesef veri yok'));
-          return _buildBody();
-        },
-      ),
-    );
+        appBar: AppBar(
+          title: Text('Depremler'),
+        ),
+        body: _buildBody());
   }
 
   Widget _buildBody() {
@@ -69,7 +67,17 @@ class _DepremlerPageState extends State<DepremlerPage> {
       children: [
         _buildSearch(),
         const SizedBox(height: 4),
-        Expanded(child: _buildDepremListView())
+        Expanded(
+          child: Builder(
+            builder: (context) {
+              if (list == null)
+                return Center(child: CircularProgressIndicator());
+              if (list!.isEmpty)
+                return Center(child: Text('Maalesef veri yok'));
+              return _buildDepremListView();
+            },
+          ),
+        )
       ],
     );
   }
