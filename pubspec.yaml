@@ -16,10 +16,6 @@ dependencies:
   cupertino_icons: ^1.0.2
   sqflite:
 
-dev_dependencies:
-  flutter_test:
-    sdk: flutter
-
 flutter:
 
   uses-material-design: true

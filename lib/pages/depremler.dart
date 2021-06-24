@@ -16,19 +16,24 @@ class _DepremlerPageState extends State<DepremlerPage> {
 
   @override
   void initState() {
-    rssService.fetch().then((_list) {
-      setState(() {
-        list = _list;
-      });
-    });
+    onRefresh();
     super.initState();
   }
 
+  void loadFromLocal() {
+    // sql den verileri çekcek
+    /*
+    setState(() {
+      list = _list;
+    });
+    
+     */
+  }
   void loadFromRemote() async {
+    // RSS DEN GELEN VERİLER SQLITE REPLACE EDILECEK
     rssService.fetch().then((_list) {
-      setState(() {
-        list = _list;
-      });
+      loadFromLocal();
+
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text('Liste yenilendi'),
       ));
