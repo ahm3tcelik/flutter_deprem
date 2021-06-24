@@ -58,6 +58,31 @@ class _DepremlerPageState extends State<DepremlerPage> {
     return Scaffold(
         appBar: AppBar(
           title: Text('Depremler'),
+          actions: [
+            PopupMenuButton(
+              itemBuilder: (BuildContext bc) => [
+                PopupMenuItem(
+                    value: "ASC",
+                    child: ListTile(
+                      title: Text("Şiddete Göre Artan"),
+                      trailing: Icon(Icons.arrow_upward),
+                    )),
+                PopupMenuItem(
+                    value: "DESC",
+                    child: ListTile(
+                      title: Text("Şiddete Göre Azalan"),
+                      trailing: Icon(Icons.arrow_downward),
+                    )),
+              ],
+              onSelected: (value) {
+                dbHelper.sortBy(value!).then((_list) {
+                  setState(() {
+                    list = _list;
+                  });
+                });
+              },
+            ),
+          ],
         ),
         body: _buildBody());
   }
