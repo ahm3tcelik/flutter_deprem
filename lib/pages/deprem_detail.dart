@@ -17,6 +17,7 @@ class DepremDetailPage extends StatefulWidget {
 class _DepremDetailPageState extends State<DepremDetailPage> {
   late final MapController controller;
 
+  // Çift tıklayınca haritayı büyüt
   void _onDoubleTap() {
     controller.zoom += 0.5;
     setState(() {});
@@ -25,11 +26,13 @@ class _DepremDetailPageState extends State<DepremDetailPage> {
   Offset? _dragStart;
   double _scaleStart = 1.0;
 
+  // haritayı kaydırma
   void _onScaleStart(ScaleStartDetails details) {
     _dragStart = details.focalPoint;
     _scaleStart = 1.0;
   }
 
+  // harita kaydırıldıktan sonra güncelle
   void _onScaleUpdate(ScaleUpdateDetails details) {
     final scaleDiff = details.scale - _scaleStart;
     _scaleStart = details.scale;
@@ -51,6 +54,7 @@ class _DepremDetailPageState extends State<DepremDetailPage> {
 
   @override
   void initState() {
+    // depremin olduğu alanı göster
     controller = MapController(
       location: LatLng(widget.deprem.enlem, widget.deprem.boylam),
     );
@@ -80,18 +84,11 @@ class _DepremDetailPageState extends State<DepremDetailPage> {
             LatLng(widget.deprem.enlem, widget.deprem.boylam));
         final homeMarkerWidget = _buildMarkerWidget(homeLocation, Colors.red);
 
-        final centerLocation = Offset(transformer.constraints.biggest.width / 2,
-            transformer.constraints.biggest.height / 2);
-
         return GestureDetector(
           behavior: HitTestBehavior.opaque,
           onDoubleTap: _onDoubleTap,
           onScaleStart: _onScaleStart,
           onScaleUpdate: _onScaleUpdate,
-          onTapUp: (details) {
-            final location =
-                transformer.fromXYCoordsToLatLng(details.localPosition);
-          },
           child: Listener(
             behavior: HitTestBehavior.opaque,
             onPointerSignal: (event) {
@@ -125,6 +122,7 @@ class _DepremDetailPageState extends State<DepremDetailPage> {
     );
   }
 
+  // Deprem noktasının işaretçisi
   Widget _buildMarkerWidget(Offset pos, Color color) {
     return Positioned(
       left: pos.dx - 16,
@@ -145,7 +143,7 @@ class _DepremDetailPageState extends State<DepremDetailPage> {
               Container(
                 padding: const EdgeInsets.all(4),
                 decoration: BoxDecoration(
-                  color: Colors.blue,
+                    color: Colors.blue,
                     boxShadow: [
                       BoxShadow(
                         color: Colors.blueGrey,
@@ -153,18 +151,22 @@ class _DepremDetailPageState extends State<DepremDetailPage> {
                         blurRadius: 2.0,
                       ),
                     ],
-                  borderRadius: BorderRadius.only(topRight: Radius.circular(8), bottomRight: Radius.circular(8), topLeft: Radius.circular(8))
-                ),
+                    borderRadius: BorderRadius.only(
+                        topRight: Radius.circular(8),
+                        bottomRight: Radius.circular(8),
+                        topLeft: Radius.circular(8))),
                 child: Text(
-                  widget.deprem.buyukluk, style: TextStyle(color: Colors.white),
+                  widget.deprem.buyukluk,
+                  style: TextStyle(color: Colors.white),
                 ),
               ),
             ],
           ),
-          Text('Deprem Noktası', style: TextStyle(
-            fontWeight: FontWeight.bold,
-            color: Colors.black54
-          ),),
+          Text(
+            'Deprem Noktası',
+            style:
+                TextStyle(fontWeight: FontWeight.bold, color: Colors.black54),
+          ),
         ],
       ),
     );
